@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Netlift Express - Freight & Logistics</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; color: #333; }
+    header {
+      background: url('https://images.unsplash.com/photo-1568964292528-7b43c248ddda?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+      height: 100vh;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    header h1 { font-size: 4rem; margin-bottom: 10px; text-shadow: 2px 2px 8px rgba(0,0,0,0.6); }
+    header p { font-size: 1.5rem; max-width: 600px; text-shadow: 1px 1px 4px rgba(0,0,0,0.5); }
+
+    nav {
+      background: #000;
+      padding: 15px 0;
+      text-align: center;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    section { padding: 60px 20px; max-width: 1000px; margin: auto; }
+    section h2 { margin-bottom: 20px; color: #007bff; }
+    section p { line-height: 1.8; }
+
+    .video-container {
+      margin-top: 30px;
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 ratio */
+      height: 0;
+      overflow: hidden;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+
+    footer {
+      background: #343a40;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+    .socials a {
+      margin: 0 10px;
+      display: inline-block;
+    }
+    .socials img {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0) invert(1);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Netlift Express</h1>
+    <p>Global (3PL) freight forwarder offering fast, reliable, and personal service worldwide.</p>
+  </header>
+
+  <nav>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#freight">Freight</a>
+    <a href="#warehouse">Warehouse</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <section id="about">
+    <h2>About Us</h2>
+    <p>We are a global third-party logistics (3PL) freight forwarder focused on offering competitive and comprehensive supply chain solutions without compromising personal service. With a reliable track record, we specialize in helping businesses move goods quickly and efficiently across borders.</p>
+  </section>
+
+  <section id="services">
+    <h2>Our Services</h2>
+    <p>Netlift Express provides end-to-end shipping services, including air and sea freight, customs clearance, last-mile delivery, and real-time tracking updates to ensure smooth logistics from pickup to delivery.</p>
+  </section>
+
+  <section id="freight">
+    <h2>Freight Expertise</h2>
+    <p>Our freight division offers tailored services for different industries with transparent pricing and expert coordination. Whether bulk or express shipments, we deliver on time—every time.</p>
+    <img src="https://images.unsplash.com/photo-1604147706284-d5b6812c2093?auto=format&fit=crop&w=1470&q=80" alt="Freight trucks" width="100%" style="margin-top:20px; border-radius:8px;">
+  </section>
+
+  <section id="warehouse">
+    <h2>Warehouse Solutions</h2>
+    <p>Our warehousing services include secure storage, inventory management, and order fulfillment solutions. Strategically located facilities allow faster processing and reduced shipping costs.</p>
+    <div class="video-container">
+      <iframe src="https://www.youtube.com/embed/tQ2V5KqKcXM" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <p>Email: <strong>netlift-express@proton.me</strong></p>
+  </section>
+
+  <footer>
+    <div class="socials">
+      <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook"></a>
+      <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter"></a>
+      <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733561.png" alt="LinkedIn"></a>
+      <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram"></a>
+    </div>
+    <p style="margin-top: 15px;">Copyright &copy; 2025 Netlift Express. All rights reserved.</p>
+  </footer>
+</body>
+</html>
