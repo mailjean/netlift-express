@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netlift Express - Fast & Reliable Freight Forwarding</title>
+  <style>
+    :root {
+      --primary-color: navy;
+      --secondary-color: #004080;
+      --light-color: #f0f4f8;
+      --text-color: #222;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1581090700227-1e8e601c4984?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: var(--primary-color);
+      padding: 20px 40px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 600;
+    }
+    main {
+      flex-grow: 1;
+      background-color: rgba(255,255,255,0.92);
+      max-width: 1000px;
+      margin: 30px auto;
+      border-radius: 8px;
+      padding: 30px 40px;
+    }
+    h2 {
+      color: var(--primary-color);
+      border-bottom: 3px solid var(--primary-color);
+      padding-bottom: 5px;
+      display: inline-block;
+    }
+    #trackingForm input, #trackingForm button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+    #trackingForm button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+    }
+  </style>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuNEvMGx5mKpoB1WAtTa5uhj-6gR8xEdM",
+      authDomain: "netlift-express.firebaseapp.com",
+      projectId: "netlift-express",
+      storageBucket: "netlift-express.appspot.com",
+      messagingSenderId: "539332832953",
+      appId: "1:539332832953:web:758960620445a7ff623568",
+      measurementId: "G-FC5WSLNBT3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.trackParcel = async () => {
+      const code = document.getElementById('trackingCode').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      if (!code) {
+        resultDiv.textContent = 'Please enter a tracking code.';
+        return;
+      }
+
+      const docRef = doc(db, "parcels", code);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        resultDiv.textContent = 'Tracking code not found.';
+        return;
+      }
+
+      const data = docSnap.data();
+      let historyHtml = '';
+
+      if (Array.isArray(data.history)) {
+        data.history.forEach((entry, index) => {
+          historyHtml += `<div><strong>Step ${index + 1}:</strong> ${entry.status} - ${entry.location} (${entry.condition})</div>`;
+        });
+      }
+
+      const img = data.imageUrl ? `<img src="${data.imageUrl}" alt="Parcel Image" style="max-width:100%;margin-top:10px;">` : '';
+      const map = data.mapUrl ? `<div style="margin-top:10px;"><a href="${data.mapUrl}" target="_blank">View Location Map</a></div>` : '';
+
+      resultDiv.innerHTML = `
+        <div><strong>Tracking Code:</strong> ${code}</div>
+        ${img}
+        ${map}
+        <h3>Tracking History:</h3>
+        ${historyHtml || 'No updates yet.'}
+      `;
+    };
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Netlift Express</h1>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#freight">Freight</a>
+      <a href="#warehouse">Warehouse</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+  <main>
+    <section id="track">
+      <h2>Track Your Parcel</h2>
+      <form id="trackingForm" onsubmit="event.preventDefault(); trackParcel();">
+        <input type="text" id="trackingCode" placeholder="Enter Tracking Code" />
+        <button type="submit">Track</button>
+        <div id="result"></div>
+      </form>
+    </section>
+
+    <section id="about">
+      <h2>About Netlift Express</h2>
+      <p>We are a global 3PL freight forwarder focused on offering competitive and comprehensive logistics solutions without compromising personal service.</p>
+    </section>
+
+    <section id="services">
+      <h2>Our Services</h2>
+      <ul>
+        <li>International Freight Forwarding</li>
+        <li>Warehousing & Distribution</li>
+        <li>Customs Clearance</li>
+        <li>Supply Chain Management</li>
+        <li>Express Delivery Services</li>
+      </ul>
+    </section>
+
+    <section id="freight">
+      <h2>Freight Solutions</h2>
+      <p>We handle air, sea, and land freight with tailored solutions to meet your business requirements.</p>
+    </section>
+
+    <section id="warehouse">
+      <h2>Warehouse Facilities</h2>
+      <p>Secure, advanced warehouses with real-time inventory control and tracking.</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact Us</h2>
+      <p>Email: <a href="mailto:netlift-express@proton.me">netlift-express@proton.me</a></p>
+    </section>
+  </main>
+  <footer>
+    &copy; 2025 Netlift Express. All rights reserved.
+  </footer>
+</body>
+</html>
