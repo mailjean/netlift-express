@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netlift Express - Fast & Reliable Freight Forwarding</title>
+
+  <style>
+    :root {
+      --primary-color: navy;
+      --secondary-color: #004080;
+      --light-color: #f0f4f8;
+      --text-color: #222;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: var(--primary-color);
+      padding: 20px 40px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      user-select: none;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: var(--light-color);
+    }
+    main {
+      flex-grow: 1;
+      background-color: rgba(255,255,255,0.92);
+      max-width: 1000px;
+      margin: 30px auto 50px;
+      border-radius: 8px;
+      padding: 30px 40px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    section {
+      margin-bottom: 40px;
+    }
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      border-bottom: 3px solid var(--primary-color);
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+    p {
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /* Tracking Form */
+    #trackingForm {
+      background: var(--light-color);
+      padding: 25px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 450px;
+      margin: 0 auto 30px;
+    }
+    #trackingForm label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+    #trackingForm input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      border: 2px solid var(--primary-color);
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    #trackingForm button {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 700;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+    #trackingForm button:hover {
+      background-color: var(--secondary-color);
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: 600;
+      color: var(--primary-color);
+      min-height: 1.2em;
+      text-align: center;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 15px 40px;
+      text-align: center;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+    footer a {
+      color: #bbe1ff;
+      text-decoration: none;
+      margin: 0 8px;
+      font-weight: 600;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Social Icons */
+    .social-icons {
+      margin-top: 10px;
+    }
+    .social-icons a {
+      margin: 0 10px;
+      display: inline-block;
+      color: white;
+      font-size: 1.3rem;
+      transition: color 0.3s ease;
+    }
+    .social-icons a:hover {
+      color: #bbe1ff;
+    }
+
+  </style>
+
+  <!-- Firebase v9 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuNEvMGx5mKpoB1WAtTa5uhj-6gR8xEdM",
+      authDomain: "netlift-express.firebaseapp.com",
+      projectId: "netlift-express",
+      storageBucket: "netlift-express.firebasestorage.app",
+      messagingSenderId: "539332832953",
+      appId: "1:539332832953:web:758960620445a7ff623568",
+      measurementId: "G-FC5WSLNBT3"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.trackParcel = async () => {
+      const code = document.getElementById('trackingCode').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = '';
+
+      if (!code) {
+        resultDiv.textContent = 'Please enter a tracking code.';
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "parcels", code);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          resultDiv.innerHTML = `
+            <strong>Status:</strong> ${data.status || 'N/A'}<br>
+            <strong>Location:</strong> ${data.location || 'N/A'}<br>
+            <strong>Condition:</strong> ${data.condition || 'N/A'}<br>
+            <strong>Last Updated:</strong> ${data.updated || 'N/A'}
+          `;
+        } else {
+          resultDiv.textContent = 'Tracking code not found.';
+        }
+      } catch (error) {
+        resultDiv.textContent = 'Error fetching tracking info.';
+        console.error(error);
+      }
+    };
+  </script>
+
+  <!-- FontAwesome CDN for social icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+
+<header>
+  <h1>Netlift Express</h1>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#freight">Freight</a>
+    <a href="#warehouse">Warehouse</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<main>
+
+  <section id="track">
+    <h2>Track Your Parcel</h2>
+    <form id="trackingForm" onsubmit="event.preventDefault(); trackParcel();">
+      <label for="trackingCode">Enter Tracking Code:</label>
+      <input type="text" id="trackingCode" placeholder="e.g. NETLIFT123456" />
+      <button type="submit">Track</button>
+      <div id="result"></div>
+    </form>
+  </section>
+
+  <section id="about">
+    <h2>About Netlift Express</h2>
+    <p>
+      We are a global <strong>3PL freight forwarder</strong> focused on offering competitive and comprehensive logistics solutions without compromising personal service. 
+      Our commitment is to provide fast, reliable, and seamless delivery for all your freight needs.
+    </p>
+  </section>
+
+  <section id="services">
+    <h2>Our Services</h2>
+    <ul>
+      <li>International Freight Forwarding</li>
+      <li>Warehousing & Distribution</li>
+      <li>Customs Clearance</li>
+      <li>Supply Chain Management</li>
+      <li>Express Delivery Services</li>
+    </ul>
+  </section>
+
+  <section id="freight">
+    <h2>Freight Solutions</h2>
+    <p>
+      We handle air, sea, and land freight with tailored solutions to meet your business requirements. Our experienced team ensures your cargo moves efficiently and securely worldwide.
+    </p>
+  </section>
+
+  <section id="warehouse">
+    <h2>Warehouse Facilities</h2>
+    <p>
+      Our strategically located warehouses provide secure storage with advanced inventory management systems, ensuring your goods are safe and easily accessible.
+    </p>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <p>Email: <a href="mailto:netlift-express@proton.me">netlift-express@proton.me</a></p>
+    <div class="social-icons">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Copyright © 2025 Netlift Express. All rights reserved.
+</footer>
+
+</body>
+</html>
