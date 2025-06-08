@@ -2,50 +2,136 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Netlift Express - Home</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Netlift Express</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .hero {
-      background-color: #007bff;
+    body {
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      background: #f4f4f4;
+    }
+    header {
+      background: url('https://images.unsplash.com/photo-1603204077712-336d2506f7f7?auto=format&fit=crop&w=1500&q=80') no-repeat center center/cover;
       color: white;
+      padding: 100px 20px;
+      text-align: center;
+    }
+    header img {
+      max-width: 120px;
+      margin-bottom: 20px;
+    }
+    nav {
+      background: #007bff;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    section {
       padding: 60px 20px;
       text-align: center;
     }
-    .track-box {
-      margin-top: 20px;
+    section h2 {
+      margin-bottom: 20px;
+      color: #007bff;
+    }
+    .services, .media {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .service-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 300px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .media img, .media iframe {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    footer {
+      background: #333;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      .services, .media {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="hero">
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Parcel_icon.svg/2048px-Parcel_icon.svg.png" alt="Netlift Logo" />
     <h1>Netlift Express</h1>
-    <p class="lead">Fast and Reliable Delivery Service</p>
-    <div class="track-box">
-      <input type="text" id="trackingInput" class="form-control w-50 mx-auto" placeholder="Enter Tracking Number">
-      <button onclick="trackParcel()" class="btn btn-light mt-3">Track Now</button>
+    <p>Fast. Secure. Reliable.</p>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="track.html">Track Parcel</a>
+    <!-- Admin login link intentionally removed -->
+  </nav>
+
+  <section>
+    <h2>About Us</h2>
+    <p>Netlift Express is your trusted logistics partner, delivering parcels swiftly and securely across the globe. 
+       We pride ourselves on speed, safety, and client satisfaction. With real-time tracking, secure handling, and dedicated support, 
+       we redefine delivery for the modern world.</p>
+  </section>
+
+  <section>
+    <h2>Our Services</h2>
+    <div class="services">
+      <div class="service-box">
+        <h3>Same-Day Delivery</h3>
+        <p>Deliver packages within hours across major cities.</p>
+      </div>
+      <div class="service-box">
+        <h3>International Freight</h3>
+        <p>Global shipping via air and sea with customs clearance.</p>
+      </div>
+      <div class="service-box">
+        <h3>Warehousing</h3>
+        <p>Secure and climate-controlled storage for your goods.</p>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="text-center my-4">
-    <a href="index.html" class="btn btn-link">Home</a>
-    <a href="track.html" class="btn btn-link">Track Parcel</a>
-    <a href="admin.html" class="btn btn-link">Admin Login</a>
-  </div>
+  <section>
+    <h2>Gallery</h2>
+    <div class="media">
+      <img src="https://images.unsplash.com/photo-1556514767-5c27046d0c67?auto=format&fit=crop&w=900&q=80" alt="Delivery truck" />
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/MVPTGNGiI-4" title="Delivery Video" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </section>
 
-  <footer class="bg-dark text-white text-center py-3">
-    Contact: support@netliftexpress.com
+  <section>
+    <h2>Contact Us</h2>
+    <p>Email: <a href="mailto:support@netliftexpress.com">support@netliftexpress.com</a><br>
+       Phone: +1 (234) 567-8900</p>
+  </section>
+
+  <footer>
+    &copy; 2025 Netlift Express. All rights reserved.
   </footer>
 
-  <script>
-    function trackParcel() {
-      const code = document.getElementById("trackingInput").value.trim();
-      if (code) window.location.href = `track.html?code=${code}`;
-    }
-  </script>
 </body>
 </html>
