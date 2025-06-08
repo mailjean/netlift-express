@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Netlift Express</title>
+
+  <!-- Firebase v9 modular SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, arrayUnion, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuNEvMGx5mKpoB1WAtTa5uhj-6gR8xEdM",
+      authDomain: "netlift-express.firebaseapp.com",
+      projectId: "netlift-express",
+      storageBucket: "netlift-express.appspot.com",
+      messagingSenderId: "539332832953",
+      appId: "1:539332832953:web:758960620445a7ff623568",
+      measurementId: "G-FC5WSLNBT3"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Auth state handler
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById("loginDiv").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+      } else {
+        document.getElementById("loginDiv").style.display = "block";
+        document.getElementById("adminPanel").style.display = "none";
+      }
+    });
+
+    // Login function
+    window.login = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(error => alert(error.message));
+    };
+
+    // Update parcel function
+    window.updateParcel = async () => {
+      const code = document.getElementById("trackCode").value.trim();
+      const status = document.getElementById("status").value.trim();
+      const location = document.getElementById("location").value.trim();
+      const condition = document.getElementById("condition").value.trim();
+      const picture = document.getElementById("picture").value.trim();
+      const map = document.getElementById("map").value.trim();
+
+      if (!code) {
+        alert("Please enter tracking code");
+        return;
+      }
+      if (!status && !location && !condition && !picture && !map) {
+        alert("Please add at least one update field or picture/map URL");
+        return;
+      }
+
+      try {
+        const parcelRef = doc(db, "parcels", code);
+        const parcelSnap = await getDoc(parcelRef);
+
+        if (parcelSnap.exists()) {
+          // Update existing parcel document
+          const updateData = {};
+          if (status || location || condition) {
+            // Compose update text from entered fields
+            let updateText = "";
+            if (status) updateText += `Status: ${status}`;
+            if (location) updateText += (updateText ? ", " : "") + `Location: ${location}`;
+            if (condition) updateText += (updateText ? ", " : "") + `Condition: ${condition}`;
+
+            updateData.updates = arrayUnion(updateText);
+          }
+          if (picture) updateData.picture = picture;
+          if (map) updateData.map = map;
+
+          await updateDoc(parcelRef, updateData);
+          alert("Parcel updated successfully.");
+        } else {
+          // Create new parcel document
+          const updates = [];
+          if (status || location || condition) {
+            let updateText = "";
+            if (status) updateText += `Status: ${status}`;
+            if (location) updateText += (updateText ? ", " : "") + `Location: ${location}`;
+            if (condition) updateText += (updateText ? ", " : "") + `Condition: ${condition}`;
+            if (updateText) updates.push(updateText);
+          }
+
+          await setDoc(parcelRef, {
+            updates: updates,
+            picture: picture || "",
+            map: map || ""
+          });
+          alert("New parcel created and updated.");
+        }
+
+        // Clear input fields except tracking code for convenience
+        document.getElementById("status").value = "";
+        document.getElementById("location").value = "";
+        document.getElementById("condition").value = "";
+        document.getElementById("picture").value = "";
+        document.getElementById("map").value = "";
+
+      } catch (e) {
+        alert("Error updating parcel: " + e.message);
+      }
+    };
+  </script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; max-width: 400px; }
+    input { margin: 8px 0; padding: 10px; width: 100%; box-sizing: border-box; }
+    button { padding: 10px 20px; background: #001f4d; border: none; color: white; cursor: pointer; width: 100%; font-weight: bold; }
+    #adminPanel { display: none; margin-top: 20px; }
+    h2, h3 { color: #001f4d; }
+  </style>
+</head>
+<body>
+  <h2>Admin Login & Parcel Update</h2>
+
+  <div id="loginDiv">
+    <input type="email" id="email" placeholder="Email" autocomplete="username" /><br/>
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password" /><br/>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="adminPanel">
+    <h3>Update Parcel</h3>
+    <input type="text" id="trackCode" placeholder="Tracking Code" /><br/>
+    <input type="text" id="status" placeholder="Status (e.g. In Transit)" /><br/>
+    <input type="text" id="location" placeholder="Location (e.g. New York)" /><br/>
+    <input type="text" id="condition" placeholder="Condition (e.g. Good)" /><br/>
+    <input type="text" id="picture" placeholder="Parcel Picture URL (optional)" /><br/>
+    <input type="text" id="map" placeholder="Map URL (optional)" /><br/>
+    <button onclick="updateParcel()">Update Parcel</button>
+  </div>
+
+</body>
+</html>
