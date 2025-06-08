@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netlift Express - Fast & Reliable Freight Forwarding</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1613689125393-69c9a4a29953?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header, footer {
+      background-color: navy;
+      color: white;
+      padding: 20px 40px;
+    }
+    header h1, footer {
+      margin: 0;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    main {
+      flex-grow: 1;
+      background-color: rgba(255,255,255,0.95);
+      max-width: 900px;
+      margin: 30px auto;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+
+    #trackingForm {
+      background: #f0f4f8;
+      padding: 25px;
+      border-radius: 6px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid navy;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: navy;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    #result img {
+      margin-top: 10px;
+      max-width: 100%;
+      border-radius: 6px;
+    }
+
+    #result a {
+      display: inline-block;
+      margin-top: 10px;
+      color: blue;
+      font-weight: 600;
+    }
+  </style>
+
+  <!-- Firebase v9 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuNEvMGx5mKpoB1WAtTa5uhj-6gR8xEdM",
+      authDomain: "netlift-express.firebaseapp.com",
+      projectId: "netlift-express",
+      storageBucket: "netlift-express.appspot.com",
+      messagingSenderId: "539332832953",
+      appId: "1:539332832953:web:758960620445a7ff623568"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.trackParcel = async () => {
+      const code = document.getElementById('trackingCode').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      if (!code) {
+        resultDiv.textContent = 'Please enter a tracking code.';
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "parcels", code);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          let html = `
+            <p><strong>Status:</strong> ${data.status || 'N/A'}</p>
+            <p><strong>Location:</strong> ${data.location || 'N/A'}</p>
+            <p><strong>Condition:</strong> ${data.condition || 'N/A'}</p>
+            <p><strong>Last Updated:</strong> ${data.updated || 'N/A'}</p>
+          `;
+
+          // Optional image
+          if (data.image) {
+            html += `<img src="${data.image}" alt="Parcel Image">`;
+          }
+
+          // Optional map link
+          if (data.location_url) {
+            html += `<p><a href="${data.location_url}" target="_blank">📍 View Location on Map</a></p>`;
+          }
+
+          // History
+          if (Array.isArray(data.updates)) {
+            html += `<h4>Tracking History:</h4><ul>`;
+            html += data.updates.map(u => 
+              `<li>${u.time || ''} - ${u.status || ''}</li>`
+            ).join('');
+            html += `</ul>`;
+          }
+
+          resultDiv.innerHTML = html;
+        } else {
+          resultDiv.textContent = 'Tracking code not found.';
+        }
+      } catch (error) {
+        resultDiv.textContent = 'Error fetching tracking info.';
+        console.error(error);
+      }
+    };
+  </script>
+</head>
+<body>
+
+<header>
+  <h1>Netlift Express</h1>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#freight">Freight</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>Track Your Parcel</h2>
+    <form id="trackingForm" onsubmit="event.preventDefault(); trackParcel();">
+      <input type="text" id="trackingCode" placeholder="Enter Tracking Code" />
+      <button type="submit">Track</button>
+      <div id="result"></div>
+    </form>
+  </section>
+</main>
+
+<footer>
+  &copy; 2025 Netlift Express. All rights reserved. | Email: netlift-express@proton.me
+</footer>
+
+</body>
+</html>
