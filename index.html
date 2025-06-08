@@ -4,48 +4,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Netlift Express - Track Your Parcel</title>
-
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: url('https://images.unsplash.com/photo-1661956600664-2951410cb0a2?auto=format&fit=crop&w=1470&q=80') no-repeat center/cover;
+      background: url('https://images.unsplash.com/photo-1661956600664-2951410cb0a2?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
       background-size: cover;
       color: #222;
-      display: flex; flex-direction: column; min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header, footer {
-      background: navy; color: white; padding: 20px;
+      background: navy;
+      color: white;
+      padding: 20px;
       text-align: center;
     }
     main {
       flex: 1;
-      background: rgba(255,255,255,0.9);
-      max-width: 900px;
-      margin: 20px auto;
+      background: rgba(255,255,255,0.95);
+      max-width: 800px;
+      margin: 30px auto;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     input, button {
       font-size: 1rem;
       padding: 10px;
-      margin: 5px 0;
-      width: 100%;
       border-radius: 5px;
     }
-    input { border: 2px solid navy; }
-    button { background: navy; color: white; border: none; cursor: pointer; }
-    button:hover { background: #003366; }
-    img { max-width: 100%; margin-top: 10px; border-radius: 5px; }
-    a.map-link { color: navy; font-weight: bold; display: block; margin-top: 10px; }
-    ul.history { padding-left: 20px; margin-top: 10px; }
-    ul.history li { margin: 5px 0; }
+    input {
+      border: 2px solid navy;
+    }
+    button {
+      background: navy;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #004080;
+    }
+    img {
+      margin-top: 10px;
+      max-width: 100%;
+      border-radius: 6px;
+    }
+    a {
+      color: navy;
+      text-decoration: underline;
+    }
+    ul {
+      padding-left: 20px;
+    }
   </style>
-
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDuNEvMGx5mKpoB1WAtTa5uhj-6gR8xEdM",
@@ -59,47 +81,59 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const trackForm = document.getElementById('trackForm');
     const resultDiv = document.getElementById('result');
-
-    trackForm.addEventListener('submit', (e) => {
+    document.getElementById('trackForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const code = document.getElementById('trackingCode').value.trim();
-      if (!code) return alert('Please enter a tracking code.');
+      if (!code) {
+        resultDiv.innerHTML = "<p>Please enter a tracking code.</p>";
+        return;
+      }
 
-      const docRef = doc(db, 'parcels', code);
-      onSnapshot(docRef, (docSnap) => {
+      const ref = doc(db, 'parcels', code);
+      onSnapshot(ref, (docSnap) => {
         if (!docSnap.exists()) {
-          resultDiv.innerHTML = '<p>Tracking code not found.</p>';
+          resultDiv.innerHTML = "<p>Tracking code not found.</p>";
           return;
         }
-        const d = docSnap.data();
+        const data = docSnap.data();
         let html = `
-          <p><strong>Status:</strong> ${d.status || 'N/A'}</p>
-          <p><strong>Location:</strong> ${d.location || 'N/A'}</p>
-          <p><strong>Condition:</strong> ${d.condition || 'N/A'}</p>
-          <p><strong>Last Updated:</strong> ${d.updated || 'N/A'}</p>
+          <p><strong>Status:</strong> ${data.status || 'N/A'}</p>
+          <p><strong>Location:</strong> ${data.location || 'N/A'}</p>
+          <p><strong>Condition:</strong> ${data.condition || 'N/A'}</p>
+          <p><strong>Last Updated:</strong> ${data.updated || 'N/A'}</p>
         `;
-        if (Array.isArray(d.updates)) {
-          html += '<h4>History:</h4><ul class="history">';
-          d.updates.forEach(u => {
-            html += `<li>${u.status}</li>`;
+
+        if (Array.isArray(data.updates)) {
+          html += "<h4>Tracking History:</h4><ul>";
+          data.updates.forEach(u => {
+            html += `<li>${u.status || 'Update'} - ${u.time || ''}</li>`;
           });
-          html += '</ul>';
+          html += "</ul>";
         }
-        if (d.image) html += `<img src="${d.image}" alt="Parcel Image">`;
-        if (d.location_url) html += `<a class="map-link" href="${d.location_url}" target="_blank">View on Map 📍</a>`;
+
+        if (data.image) {
+          html += `<img src="${data.image}" alt="Parcel Image">`;
+        }
+
+        if (data.location_url) {
+          html += `<p><a href="${data.location_url}" target="_blank">View Location on Map</a></p>`;
+        }
+
         resultDiv.innerHTML = html;
       }, (err) => {
+        resultDiv.innerHTML = "<p>Error loading data.</p>";
         console.error(err);
-        resultDiv.innerHTML = '<p>Error fetching data.</p>';
       });
     });
   </script>
 </head>
 <body>
 
-<header><h1>Netlift Express</h1></header>
+<header>
+  <h1>Netlift Express</h1>
+  <p>Track Your Package Instantly</p>
+</header>
 
 <main>
   <form id="trackForm">
@@ -109,7 +143,9 @@
   <div id="result"></div>
 </main>
 
-<footer>&copy; 2025 Netlift Express – Email: netlift-express@proton.me</footer>
+<footer>
+  &copy; 2025 Netlift Express. All rights reserved.
+</footer>
 
 </body>
 </html>
